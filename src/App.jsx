@@ -54,7 +54,8 @@ export default function App() {
     if (window.location.hash === '#admin') {
       window.location.hash = '';
     }
-    window.history.pushState({}, '', '/');
+    const cleanPath = window.location.pathname.replace(/\/admin\/?$/, '') || './';
+    window.history.pushState({}, '', cleanPath);
     setIsAdminRoute(false);
   };
 

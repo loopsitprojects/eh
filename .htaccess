@@ -13,16 +13,17 @@
   RewriteCond %{REQUEST_URI} uploads/ [NC]
   RewriteRule ^(.*)uploads/(.*)$ backend/uploads/$2 [L]
 
-  # 3. Route compiled production Assets to dist/assets/
+  # 3. Route compiled production Assets to dist/assets/ if nested
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteCond %{REQUEST_URI} assets/ [NC]
+  RewriteCond dist/assets/$2 -f
   RewriteRule ^(.*)assets/(.*)$ dist/assets/$2 [L]
 
-  # 4. Route SPA pages & main URL to compiled dist/index.html if available
+  # 4. Route SPA pages & main URL to index.html
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteCond %{DOCUMENT_ROOT}/dist/index.html -f
+  RewriteCond dist/index.html -f
   RewriteRule ^ dist/index.html [L]
 
   RewriteCond %{REQUEST_FILENAME} !-f

@@ -15,7 +15,7 @@ export default function StatsBanner() {
 
   const fetchStats = async () => {
     try {
-      const res = await fetch('/api/stats.php');
+      const res = await fetch('api/stats.php');
       const data = await res.json();
       if (data.success && data.stats) {
         setStats(prev => ({

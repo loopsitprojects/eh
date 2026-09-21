@@ -76,7 +76,7 @@ export default function WishModal({ isOpen, onClose, onWishSubmitted }) {
         formData.append('image', selectedFile);
       }
 
-      const res = await fetch('/api/submit_wish.php', {
+      const res = await fetch('api/submit_wish.php', {
         method: 'POST',
         body: formData
       });

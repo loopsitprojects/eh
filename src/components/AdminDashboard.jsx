@@ -68,7 +68,7 @@ export default function AdminDashboard({ onBackToCampaign }) {
 
   const verifyTokenAndLoad = async () => {
     try {
-      const authRes = await fetch('/api/admin/check_auth.php', {
+      const authRes = await fetch('api/admin/check_auth.php', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const authData = await authRes.json();
@@ -104,7 +104,7 @@ export default function AdminDashboard({ onBackToCampaign }) {
     setIsSubmittingLogin(true);
 
     try {
-      const res = await fetch('/api/admin/login.php', {
+      const res = await fetch('api/admin/login.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
@@ -129,7 +129,7 @@ export default function AdminDashboard({ onBackToCampaign }) {
   const handleLogout = async () => {
     if (token) {
       try {
-        await fetch('/api/admin/logout.php', {
+        await fetch('api/admin/logout.php', {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
@@ -151,7 +151,7 @@ export default function AdminDashboard({ onBackToCampaign }) {
     if (!token) return;
     setDashLoading(true);
     try {
-      const res = await fetch('/api/admin/dashboard_stats.php', {
+      const res = await fetch('api/admin/dashboard_stats.php', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -172,7 +172,7 @@ export default function AdminDashboard({ onBackToCampaign }) {
     if (!token) return;
     setLoading(true);
     try {
-      const url = `/api/admin/wishes.php?status=${activeTab}&lang=${activeLangTab}&q=${encodeURIComponent(searchQuery)}`;
+      const url = `api/admin/wishes.php?status=${activeTab}&lang=${activeLangTab}&q=${encodeURIComponent(searchQuery)}`;
       const res = await fetch(url, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -196,7 +196,7 @@ export default function AdminDashboard({ onBackToCampaign }) {
     if (!token) return;
     setUsersLoading(true);
     try {
-      const res = await fetch('/api/admin/users.php', {
+      const res = await fetch('api/admin/users.php', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -220,7 +220,7 @@ export default function AdminDashboard({ onBackToCampaign }) {
     setIsCreatingUser(true);
 
     try {
-      const res = await fetch('/api/admin/users.php', {
+      const res = await fetch('api/admin/users.php', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -257,7 +257,7 @@ export default function AdminDashboard({ onBackToCampaign }) {
     if (!confirm(`Are you sure you want to delete admin user '${usernameToDelete}'?`)) return;
 
     try {
-      const res = await fetch('/api/admin/users.php', {
+      const res = await fetch('api/admin/users.php', {
         method: 'DELETE',
         headers: { 
           'Content-Type': 'application/json',
@@ -282,7 +282,7 @@ export default function AdminDashboard({ onBackToCampaign }) {
     if (!token) return;
     setLogsLoading(true);
     try {
-      const url = `/api/admin/activity_logs.php?q=${encodeURIComponent(logSearch)}`;
+      const url = `api/admin/activity_logs.php?q=${encodeURIComponent(logSearch)}`;
       const res = await fetch(url, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -303,7 +303,7 @@ export default function AdminDashboard({ onBackToCampaign }) {
     if (!token) return;
     setActionLoadingId(wishId);
     try {
-      const res = await fetch('/api/admin/action.php', {
+      const res = await fetch('api/admin/action.php', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -375,7 +375,7 @@ export default function AdminDashboard({ onBackToCampaign }) {
 
     try {
       // 1. Try API file download stream first
-      let exportUrl = `/api/admin/export_wishes.php?format=${format}&status=${activeTab}&lang=${activeLangTab}&q=${encodeURIComponent(searchQuery)}`;
+      let exportUrl = `api/admin/export_wishes.php?format=${format}&status=${activeTab}&lang=${activeLangTab}&q=${encodeURIComponent(searchQuery)}`;
       if (exportSelectedOnly && targetWishIds.length > 0) {
         exportUrl += `&ids=${targetWishIds.join(',')}`;
       }

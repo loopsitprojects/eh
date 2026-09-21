@@ -18,7 +18,7 @@ export default function WishGallery({ refreshTrigger }) {
   const fetchWishes = async () => {
     setLoading(true);
     try {
-      const url = `/api/get_wishes.php?q=${encodeURIComponent(searchQuery)}&city=${encodeURIComponent(selectedCity)}&sort=${sortBy}&lang=${language}`;
+      const url = `api/get_wishes.php?q=${encodeURIComponent(searchQuery)}&city=${encodeURIComponent(selectedCity)}&sort=${sortBy}&lang=${language}`;
       const res = await fetch(url);
       const data = await res.json();
       if (data.success) {
@@ -39,7 +39,7 @@ export default function WishGallery({ refreshTrigger }) {
     setLikedIds(prev => new Set(prev).add(wishId));
 
     try {
-      await fetch('/api/like_wish.php', {
+      await fetch('api/like_wish.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ wish_id: wishId })
