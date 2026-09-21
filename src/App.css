@@ -4122,16 +4122,30 @@ body.lang-ta .scene-good-people {
   font-size: 0.82rem;
   font-weight: 600;
   color: #FFFFFF;
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   flex-wrap: wrap;
+}
+
+.footer-crafted-line {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  gap: 4px;
 }
 
 .footer-heart-icon {
   display: inline-block;
   vertical-align: middle;
   margin: 0 2px;
+}
+
+@media (max-width: 480px) {
+  .footer-copyright-text {
+    font-size: 0.74rem;
+  }
 }
 
 /* ==========================================================================
