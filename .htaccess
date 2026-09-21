@@ -1,14 +1,30 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteBase /eh/
 
-  # Handle PHP API Requests directly if placed inside api/ or backend/
+  # 1. Route API requests to backend/api/
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteCond %{REQUEST_URI} ^/eh/api/ [NC]
-  RewriteRule ^api/(.*)$ backend/api/$1 [L]
+  RewriteCond %{REQUEST_URI} api/ [NC]
+  RewriteRule ^(.*)api/(.*)$ backend/api/$2 [L]
 
-  # Redirect all SPA routes (e.g. /admin) to index.html
+  # 2. Route Uploads requests to backend/uploads/
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_URI} uploads/ [NC]
+  RewriteRule ^(.*)uploads/(.*)$ backend/uploads/$2 [L]
+
+  # 3. Route compiled production Assets to dist/assets/
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_URI} assets/ [NC]
+  RewriteRule ^(.*)assets/(.*)$ dist/assets/$2 [L]
+
+  # 4. Route SPA pages & main URL to compiled dist/index.html if available
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{DOCUMENT_ROOT}/dist/index.html -f
+  RewriteRule ^ dist/index.html [L]
+
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule ^ index.html [L]
