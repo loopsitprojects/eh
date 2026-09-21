@@ -1,5 +1,11 @@
+# Set default index page to dist/index.html first
+DirectoryIndex dist/index.html index.html
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
+
+  # Define base directory for subfolder deployment
+  RewriteBase /eh/
 
   # 1. Route API requests to backend/api/
   RewriteCond %{REQUEST_FILENAME} !-f
@@ -13,22 +19,19 @@
   RewriteCond %{REQUEST_URI} uploads/ [NC]
   RewriteRule ^(.*)uploads/(.*)$ backend/uploads/$2 [L]
 
-  # 3. If whole project is uploaded, route root/index.html requests to dist/index.html
-  RewriteCond dist/index.html -f
+  # 3. Route root / or index.html requests directly to dist/index.html
+  RewriteCond %{REQUEST_URI} !^/eh/dist/
   RewriteRule ^(index\.html)?$ dist/index.html [L]
 
-  # 4. Route asset requests to dist/assets/ if dist/assets exists
+  # 4. Route asset & favicon requests to dist/ directory if not found in root
   RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond dist/assets/$1 -f
   RewriteRule ^assets/(.*)$ dist/assets/$1 [L]
 
-  # 5. Route SPA pages & main URL fallback
   RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteCond dist/index.html -f
-  RewriteRule ^ dist/index.html [L]
+  RewriteRule ^favicon\.svg$ dist/favicon.svg [L]
 
+  # 5. SPA Fallback for all other non-file/non-directory routes
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule ^ index.html [L]
+  RewriteRule ^ dist/index.html [L]
 </IfModule>
