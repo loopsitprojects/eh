@@ -1,0 +1,15 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /eh/
+
+  # Handle PHP API Requests directly if placed inside api/ or backend/
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_URI} ^/eh/api/ [NC]
+  RewriteRule ^api/(.*)$ backend/api/$1 [L]
+
+  # Redirect all SPA routes (e.g. /admin) to index.html
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^ index.html [L]
+</IfModule>

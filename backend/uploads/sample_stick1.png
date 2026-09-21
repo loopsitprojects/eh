@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="200" viewBox="0 0 600 200">
+  <defs>
+    <linearGradient id="stickGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#EED5AD"/>
+      <stop offset="50%" stop-color="#F8E5C4"/>
+      <stop offset="100%" stop-color="#E5C79A"/>
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="3" dy="5" stdDeviation="4" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  <rect width="600" height="200" fill="#FFFCEB"/>
+  <rect x="40" y="60" width="520" height="80" rx="40" ry="40" fill="url(#stickGrad)" stroke="#C8A572" stroke-width="4" filter="url(#shadow)"/>
+  <!-- Grain lines -->
+  <path d="M 90 85 Q 250 82 510 85" stroke="#DFBD8E" stroke-width="2" fill="none" opacity="0.6"/>
+  <path d="M 80 115 Q 300 118 520 115" stroke="#DFBD8E" stroke-width="2" fill="none" opacity="0.6"/>
+  <!-- Handwritten Text -->
+  <text x="300" y="110" font-family="'Comic Sans MS', 'Fredoka', cursive, sans-serif" font-size="22" font-weight="bold" fill="#1E293B" text-anchor="middle">
+    I wish a child could get their dream bicycle. ♡
+  </text>
+</svg>
