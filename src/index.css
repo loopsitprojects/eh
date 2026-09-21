@@ -26,11 +26,16 @@
   padding: 0;
 }
 
+html, body, #root {
+  max-width: 100vw;
+  overflow-x: hidden;
+  position: relative;
+}
+
 body {
   font-family: var(--font-body);
   background-color: var(--color-bg-cream);
   color: var(--color-navy);
-  overflow-x: hidden;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
