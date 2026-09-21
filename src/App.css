@@ -3759,6 +3759,85 @@ body.lang-ta .scene-good-people {
 }
 
 /* ==========================================================================
+   Sinhala & Tamil Mobile-Specific Font Size Reductions (Mobile only)
+   ========================================================================== */
+@media (max-width: 576px) {
+  body.lang-si .title-row-lime,
+  body.lang-si .title-row-white,
+  body.lang-ta .title-row-lime,
+  body.lang-ta .title-row-white {
+    font-size: 1.45rem !important;
+    line-height: 1.2 !important;
+  }
+
+  body.lang-si .hero-description,
+  body.lang-ta .hero-description {
+    font-size: 0.74rem !important;
+    line-height: 1.35 !important;
+    max-width: 290px !important;
+  }
+
+  body.lang-si .btn-make-wish,
+  body.lang-ta .btn-make-wish {
+    font-size: 0.8rem !important;
+    padding: 0.45rem 1.35rem !important;
+  }
+
+  body.lang-si .script-every-wish,
+  body.lang-ta .script-every-wish {
+    font-size: 1.5rem !important;
+    line-height: 1.1 !important;
+  }
+
+  body.lang-si .matters-title,
+  body.lang-ta .matters-title {
+    font-size: 1.35rem !important;
+    line-height: 1.1 !important;
+  }
+
+  body.lang-si .middle-subheading,
+  body.lang-ta .middle-subheading {
+    font-size: 0.75rem !important;
+    line-height: 1.3 !important;
+    max-width: 200px !important;
+  }
+
+  body.lang-si .ribbon-text,
+  body.lang-ta .ribbon-text {
+    font-size: 1.05rem !important;
+  }
+
+  body.lang-si .step-title,
+  body.lang-ta .step-title {
+    font-size: 1.05rem !important;
+  }
+
+  body.lang-si .step-desc,
+  body.lang-ta .step-desc {
+    font-size: 0.68rem !important;
+  }
+
+  body.lang-si .modal-title,
+  body.lang-ta .modal-title {
+    font-size: 1.2rem !important;
+  }
+
+  body.lang-si .modal-subtitle,
+  body.lang-ta .modal-subtitle {
+    font-size: 0.75rem !important;
+  }
+}
+
+@media (max-width: 360px) {
+  body.lang-si .title-row-lime,
+  body.lang-si .title-row-white,
+  body.lang-ta .title-row-lime,
+  body.lang-ta .title-row-white {
+    font-size: 1.3rem !important;
+  }
+}
+
+/* ==========================================================================
    Admin Records Export Buttons Styling (CSV & Excel)
    ========================================================================== */
 .header-actions-row {
