@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Heart, ShieldCheck } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 import PrivacyPolicyModal from './PrivacyPolicyModal';
 
 export default function Footer() {
@@ -34,9 +34,6 @@ export default function Footer() {
         {/* Copyright Text */}
         <div className="footer-copyright-text">
           <span>© 2026 Elephant House Wonder. All rights reserved.</span>
-          <span className="footer-crafted-line">
-            Crafted with <Heart size={14} fill="#FFFFFF" color="#FFFFFF" className="footer-heart-icon" /> for children across Sri Lanka.
-          </span>
         </div>
 
       </div>

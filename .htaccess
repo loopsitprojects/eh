@@ -5,7 +5,7 @@ DirectoryIndex dist/index.html index.html
   RewriteEngine On
 
   # Define base directory for subfolder deployment
-  RewriteBase /eh/
+  RewriteBase /
 
   # 1. Route API requests to backend/api/
   RewriteCond %{REQUEST_FILENAME} !-f
@@ -20,7 +20,7 @@ DirectoryIndex dist/index.html index.html
   RewriteRule ^(.*)uploads/(.*)$ backend/uploads/$2 [L]
 
   # 3. Route root / or index.html requests directly to dist/index.html
-  RewriteCond %{REQUEST_URI} !^/eh/dist/
+  RewriteCond %{REQUEST_URI} !^/dist/
   RewriteRule ^(index\.html)?$ dist/index.html [L]
 
   # 4. Route asset & favicon requests to dist/ directory if not found in root
