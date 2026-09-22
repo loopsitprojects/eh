@@ -113,12 +113,6 @@ class Database {
             // Column already exists
         }
 
-        // Seed initial sample wishes if empty
-        $stmt = $pdo->query("SELECT COUNT(*) FROM `wishes`");
-        if ($stmt->fetchColumn() == 0) {
-            self::seedSampleData($pdo);
-        }
-
         // Seed default admin if empty
         self::ensureDefaultAdmin($pdo);
     }
@@ -190,11 +184,6 @@ class Database {
             // Column already exists
         }
 
-        $stmt = self::$conn->query("SELECT COUNT(*) FROM wishes");
-        if ($stmt->fetchColumn() == 0) {
-            self::seedSampleData(self::$conn);
-        }
-
         self::ensureDefaultAdmin(self::$conn);
 
         return self::$conn;
@@ -209,70 +198,6 @@ class Database {
             
             $stmt = $pdo->prepare("INSERT INTO admins (username, password_hash, name, role) VALUES (?, ?, ?, ?)");
             $stmt->execute([$default_user, $hash, 'Wonder Campaign Administrator', 'superadmin']);
-        }
-    }
-
-    private static function seedSampleData($pdo) {
-        $sample_wishes = [
-            [
-                'wish_title' => 'A Dream Bicycle for Nimal',
-                'wish_story' => 'I wish a child in rural Matara could get their dream bicycle to ride to school safely every day.',
-                'submitter_name' => 'Kasun Perera',
-                'submitter_phone' => '0771234567',
-                'submitter_email' => 'kasun@example.com',
-                'city_region' => 'Matara',
-                'image_path' => 'uploads/sample_stick1.png',
-                'likes_count' => 42,
-                'lang' => 'en'
-            ],
-            [
-                'wish_title' => 'පාසල් ළමයින් සඳහා පොත් සහ බෑග්',
-                'wish_story' => 'අනුරාධපුර ප්‍රාථමික පාසලේ ළමුන් 50 දෙනෙකුට අලුත් කතන්දර පොත්, ලිපිද්‍රව්‍ය සහ පාසල් බෑග් ලැබේවායි ප්‍රාර්ථනා කරමි.',
-                'submitter_name' => 'දිලිනි ප්‍රනාන්දු',
-                'submitter_phone' => '0719876543',
-                'submitter_email' => 'dilini@example.com',
-                'city_region' => 'Anuradhapura',
-                'image_path' => 'uploads/sample_stick2.png',
-                'likes_count' => 89,
-                'lang' => 'si'
-            ],
-            [
-                'wish_title' => 'மாணவர்களுக்கான சூரிய சக்தி விளக்குகள்',
-                'wish_story' => 'மின்சாரம் இல்லாத கிராமங்களில் உள்ள குழந்தைகள் இரவில் வசதியாகப் படிக்க சூரிய சக்தியால் இயங்கும் விளக்குகள் கிடைக்க விரும்புகிறேன்.',
-                'submitter_name' => 'செல்வம் ஜெயசிங்க',
-                'submitter_phone' => '0754443322',
-                'submitter_email' => 'selvam@example.com',
-                'city_region' => 'Kandy',
-                'image_path' => 'uploads/sample_stick3.png',
-                'likes_count' => 128,
-                'lang' => 'ta'
-            ],
-            [
-                'wish_title' => 'Art & Painting Kits',
-                'wish_story' => 'I wish young aspiring artists in Jaffna children home get paint sets, canvases, and drawing tools to spark creative joy.',
-                'submitter_name' => 'Nimanthi Silva',
-                'submitter_phone' => '0781112233',
-                'submitter_email' => 'nimanthi@example.com',
-                'city_region' => 'Jaffna',
-                'image_path' => 'uploads/sample_stick4.png',
-                'likes_count' => 64,
-                'lang' => 'en'
-            ]
-        ];
-
-        $stmt = $pdo->prepare("INSERT INTO wishes (wish_title, wish_story, submitter_name, submitter_phone, submitter_email, city_region, image_path, likes_count, lang, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved')");
-        foreach ($sample_wishes as $w) {
-            $stmt->execute([
-                $w['wish_title'],
-                $w['wish_story'],
-                $w['submitter_name'],
-                $w['submitter_phone'],
-                $w['submitter_email'],
-                $w['city_region'],
-                $w['image_path'],
-                $w['likes_count'],
-                $w['lang'] ?? 'en'
-            ]);
         }
     }
 }
