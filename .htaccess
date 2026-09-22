@@ -28,7 +28,7 @@ DirectoryIndex dist/index.html index.html
   RewriteRule ^assets/(.*)$ dist/assets/$1 [L]
 
   RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteRule ^favicon\.svg$ dist/favicon.svg [L]
+  RewriteRule ^favicon\.(png|svg|ico)$ dist/favicon.$1 [L]
 
   # 5. SPA Fallback for all other non-file/non-directory routes
   RewriteCond %{REQUEST_FILENAME} !-f
