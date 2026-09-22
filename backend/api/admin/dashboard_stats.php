@@ -19,14 +19,14 @@ try {
     // Overall wishes metrics & Today's Wishes
     $stmt = $db->query("SELECT 
         COUNT(*) as total,
-        SUM(CASE WHEN DATE(created_at) = CURRENT_DATE THEN 1 ELSE 0 END) as todays_count,
-        SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
-        SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved,
-        SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected,
+        COALESCE(SUM(CASE WHEN DATE(created_at) = CURRENT_DATE THEN 1 ELSE 0 END), 0) as todays_count,
+        COALESCE(SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END), 0) as pending,
+        COALESCE(SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END), 0) as approved,
+        COALESCE(SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END), 0) as rejected,
         COALESCE(SUM(likes_count), 0) as total_likes,
-        SUM(CASE WHEN lang = 'en' OR lang IS NULL OR lang = '' THEN 1 ELSE 0 END) as count_en,
-        SUM(CASE WHEN lang = 'si' THEN 1 ELSE 0 END) as count_si,
-        SUM(CASE WHEN lang = 'ta' THEN 1 ELSE 0 END) as count_ta
+        COALESCE(SUM(CASE WHEN lang = 'en' OR lang IS NULL OR lang = '' THEN 1 ELSE 0 END), 0) as count_en,
+        COALESCE(SUM(CASE WHEN lang = 'si' THEN 1 ELSE 0 END), 0) as count_si,
+        COALESCE(SUM(CASE WHEN lang = 'ta' THEN 1 ELSE 0 END), 0) as count_ta
         FROM wishes");
     $wishStats = $stmt->fetch(PDO::FETCH_ASSOC);
 

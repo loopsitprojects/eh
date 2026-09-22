@@ -17,19 +17,62 @@ $adminSession = requireAuth();
 $input = json_decode(file_get_contents('php://input'), true);
 
 $id = intval($input['id'] ?? $_POST['id'] ?? 0);
-$action = trim($input['action'] ?? $_POST['action'] ?? ''); // 'approve', 'reject', 'pending', 'delete'
+$ids = $input['ids'] ?? $_POST['ids'] ?? [];
+if (!is_array($ids) && !empty($ids)) {
+    $ids = explode(',', $ids);
+}
+$ids = array_map('intval', array_filter($ids));
 
-if ($id <= 0 || !in_array($action, ['approve', 'reject', 'pending', 'delete'])) {
+$action = trim($input['action'] ?? $_POST['action'] ?? ''); // 'approve', 'reject', 'pending', 'delete', 'delete_batch', 'delete_all'
+
+if (!in_array($action, ['approve', 'reject', 'pending', 'delete', 'delete_batch', 'delete_all'])) {
     http_response_code(400);
     echo json_encode([
         'success' => false,
-        'error' => 'Invalid wish ID or action'
+        'error' => 'Invalid wish ID or action specified'
     ]);
     exit;
 }
 
 try {
     $db = Database::getConnection();
+
+    if ($action === 'delete_all') {
+        $db->exec("DELETE FROM wishes");
+        logAdminActivity($adminSession['admin_id'], $adminSession['username'], 'delete_all_wishes', 'Deleted all wishes from database');
+        echo json_encode([
+            'success' => true,
+            'message' => 'All wishes deleted successfully from database',
+            'action' => $action
+        ]);
+        exit;
+    }
+
+    if ($action === 'delete_batch') {
+        if (empty($ids)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'No wish IDs provided for batch delete']);
+            exit;
+        }
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $stmt = $db->prepare("DELETE FROM wishes WHERE id IN ($placeholders)");
+        $stmt->execute($ids);
+        $count = count($ids);
+        logAdminActivity($adminSession['admin_id'], $adminSession['username'], 'delete_batch_wishes', "Batch deleted {$count} wishes from database");
+        echo json_encode([
+            'success' => true,
+            'message' => "Successfully deleted {$count} selected wishes",
+            'count' => $count,
+            'action' => $action
+        ]);
+        exit;
+    }
+
+    if ($id <= 0) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'Invalid wish ID']);
+        exit;
+    }
 
     if ($action === 'delete') {
         $stmt = $db->prepare("DELETE FROM wishes WHERE id = ?");

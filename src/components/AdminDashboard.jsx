@@ -366,6 +366,60 @@ export default function AdminDashboard({ onBackToCampaign }) {
     setSelectedWishIds([]);
   };
 
+  const handleDeleteBatch = async () => {
+    if (selectedWishIds.length === 0 || !token) return;
+    if (!window.confirm(`Are you sure you want to delete ${selectedWishIds.length} selected record(s) permanently from the database?`)) return;
+
+    try {
+      const res = await fetch('api/admin/action.php', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ ids: selectedWishIds, action: 'delete_batch' })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSelectedWishIds([]);
+        fetchAdminData();
+        fetchDashboardStats();
+      } else {
+        alert(data.error || 'Failed to delete selected records');
+      }
+    } catch (err) {
+      alert('Network error while deleting selected records');
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    if (!token) return;
+    if (!window.confirm("WARNING: Are you sure you want to DELETE ALL wish records permanently from the database?")) return;
+    if (!window.confirm("This action CANNOT be undone! Confirm again to delete ALL records in database.")) return;
+
+    try {
+      const res = await fetch('api/admin/action.php', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ action: 'delete_all' })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSelectedWishIds([]);
+        fetchAdminData();
+        fetchDashboardStats();
+        alert('All wish records have been deleted successfully from the database.');
+      } else {
+        alert(data.error || 'Failed to delete all records');
+      }
+    } catch (err) {
+      alert('Network error while deleting all records');
+    }
+  };
+
   // Handle Exporting Records (Full or Selected) to CSV or Excel
   const handleExportRecords = async (format = 'csv', forceOnlySelected = false) => {
     if (!token) return;
@@ -867,6 +921,17 @@ export default function AdminDashboard({ onBackToCampaign }) {
                   </button>
                 </div>
 
+                {stats.total > 0 && (
+                  <button 
+                    onClick={handleDeleteAll} 
+                    className="admin-export-btn btn-delete-all"
+                    style={{ backgroundColor: '#EF4444', color: '#FFFFFF', borderColor: '#DC2626' }}
+                    title="Permanently delete all wish records from database"
+                  >
+                    <Trash2 size={15} /> Delete All Records
+                  </button>
+                )}
+
                 <button onClick={fetchAdminData} className="admin-refresh-btn" title="Refresh Records">
                   <RefreshCw size={16} className={loading ? 'spin' : ''} />
                 </button>
@@ -968,6 +1033,13 @@ export default function AdminDashboard({ onBackToCampaign }) {
                     className="admin-export-btn btn-excel"
                   >
                     <FileSpreadsheet size={14} /> Export Selected Excel ({selectedWishIds.length})
+                  </button>
+                  <button 
+                    onClick={handleDeleteBatch} 
+                    className="admin-export-btn btn-delete-batch"
+                    style={{ backgroundColor: '#EF4444', color: '#FFFFFF', borderColor: '#DC2626' }}
+                  >
+                    <Trash2 size={14} /> Delete Selected ({selectedWishIds.length})
                   </button>
                   <button 
                     onClick={clearSelection} 
