@@ -4961,6 +4961,207 @@ body.lang-ta .scene-good-people {
   color: #F8FAFC;
 }
 
+/* ==========================================================================
+   Image Preview & Download Enhancements in Admin Dashboard
+   ========================================================================== */
+.clickable-img-wrap {
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  border: 2px solid #334155;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.clickable-img-wrap:hover {
+  border-color: #38BDF8;
+  transform: scale(1.02);
+}
+
+.image-hover-zoom-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  color: #FFFFFF;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.clickable-img-wrap:hover .image-hover-zoom-overlay {
+  opacity: 1;
+}
+
+.record-image-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  width: 100%;
+}
+
+.btn-image-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.btn-view-full {
+  background: #334155;
+  color: #F8FAFC;
+}
+
+.btn-view-full:hover {
+  background: #475569;
+  color: #FFFFFF;
+}
+
+.btn-download-img {
+  background: linear-gradient(135deg, #E6007E 0%, #BE3493 100%);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(230, 0, 126, 0.3);
+}
+
+.btn-download-img:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(230, 0, 126, 0.5);
+}
+
+.btn-action.download {
+  background: rgba(56, 189, 248, 0.18);
+  color: #38BDF8;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+}
+
+.btn-action.download:hover {
+  background: #38BDF8;
+  color: #0F172A;
+}
+
+/* Full-Screen Image Lightbox Viewer */
+.full-image-viewer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(10px);
+  z-index: 20000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: fadeInOverlay 0.2s ease-out;
+}
+
+.full-image-viewer-container {
+  background: #1E293B;
+  border: 1px solid #334155;
+  border-radius: 20px;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+}
+
+.full-image-header {
+  padding: 1rem 1.5rem;
+  background: #0F172A;
+  border-bottom: 1px solid #334155;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.full-image-title h4 {
+  margin: 0;
+  color: #F8FAFC;
+  font-size: 1.1rem;
+}
+
+.full-image-title small {
+  color: #94A3B8;
+  font-size: 0.8rem;
+}
+
+.full-image-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.btn-full-download {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #E6007E;
+  color: #FFFFFF;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-full-download:hover {
+  background: #C2006B;
+}
+
+.btn-full-close {
+  background: #334155;
+  color: #CBD5E1;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-full-close:hover {
+  background: #EF4444;
+  color: #FFFFFF;
+}
+
+.full-image-body {
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  max-height: calc(90vh - 80px);
+}
+
+.full-image-body img {
+  max-width: 100%;
+  max-height: calc(85vh - 100px);
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+
 
 
 

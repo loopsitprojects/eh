@@ -3,7 +3,7 @@ import {
   Lock, User, LogOut, CheckCircle, XCircle, Trash2, Clock, 
   Search, ShieldCheck, RefreshCw, Phone, Mail, MapPin, Eye, EyeOff, ArrowLeft, Heart, 
   LayoutDashboard, FileText, Users, Activity, UserPlus, Shield, PlusCircle, Layers, Check,
-  BarChart2, Calendar, TrendingUp, Maximize2, X, Download, FileSpreadsheet
+  BarChart2, Calendar, TrendingUp, Maximize2, X, Download, FileSpreadsheet, Edit
 } from 'lucide-react';
 import elephantHouseLogo from '../assets/elephant-house-logo-v3.png';
 import wonderLogo from '../assets/wonder-logo.png';
@@ -36,6 +36,7 @@ export default function AdminDashboard({ onBackToCampaign }) {
 
   // Lightbox Preview Modal State
   const [previewWish, setPreviewWish] = useState(null);
+  const [fullScreenImage, setFullScreenImage] = useState(null);
 
   // Dashboard Overview State
   const [dashboardData, setDashboardData] = useState(null);
@@ -53,6 +54,16 @@ export default function AdminDashboard({ onBackToCampaign }) {
   const [userMsg, setUserMsg] = useState('');
   const [userError, setUserError] = useState('');
   const [isCreatingUser, setIsCreatingUser] = useState(false);
+
+  // User Edit State
+  const [editingUser, setEditingUser] = useState(null);
+  const [editUsername, setEditUsername] = useState('');
+  const [editPassword, setEditPassword] = useState('');
+  const [editName, setEditName] = useState('');
+  const [editRole, setEditRole] = useState('admin');
+  const [isUpdatingUser, setIsUpdatingUser] = useState(false);
+  const [editUserError, setEditUserError] = useState('');
+  const [editUserMsg, setEditUserMsg] = useState('');
 
   // Activity Log Tab State
   const [logsList, setLogsList] = useState([]);
@@ -277,6 +288,73 @@ export default function AdminDashboard({ onBackToCampaign }) {
     }
   };
 
+  // Start Editing User
+  const handleStartEditUser = (u) => {
+    setEditingUser(u);
+    setEditUsername(u.username);
+    setEditName(u.name);
+    setEditRole(u.role || 'admin');
+    setEditPassword('');
+    setEditUserError('');
+    setEditUserMsg('');
+  };
+
+  // Submit Edit User Form
+  const handleUpdateUser = async (e) => {
+    e.preventDefault();
+    if (!editingUser) return;
+    setEditUserError('');
+    setEditUserMsg('');
+    setIsUpdatingUser(true);
+
+    try {
+      const res = await fetch('api/admin/users.php', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          action: 'update',
+          id: editingUser.id,
+          username: editUsername,
+          name: editName,
+          role: editRole,
+          password: editPassword
+        })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setEditUserMsg(data.message || 'User credentials updated successfully!');
+        
+        // If current session admin edited their own account details, update localStorage and state
+        if (adminUser && adminUser.id === editingUser.id) {
+          const updatedAdmin = {
+            ...adminUser,
+            username: editUsername,
+            name: editName,
+            role: editRole
+          };
+          setAdminUser(updatedAdmin);
+          localStorage.setItem('admin_user', JSON.stringify(updatedAdmin));
+        }
+
+        setTimeout(() => {
+          setEditingUser(null);
+          setEditUserMsg('');
+          fetchUsers();
+        }, 1000);
+      } else {
+        setEditUserError(data.error || 'Failed to update user');
+      }
+    } catch (err) {
+      setEditUserError('Network error while updating user');
+    } finally {
+      setIsUpdatingUser(false);
+    }
+  };
+
   // 4. Fetch Activity Logs
   const fetchLogs = async () => {
     if (!token) return;
@@ -417,6 +495,32 @@ export default function AdminDashboard({ onBackToCampaign }) {
       }
     } catch (err) {
       alert('Network error while deleting all records');
+    }
+  };
+
+  // Handle Single Wish Image Download
+  const handleDownloadWishImage = async (imagePath, wishTitle, wishId) => {
+    if (!imagePath) return;
+    const imageSrc = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+    try {
+      const response = await fetch(imageSrc);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const ext = imagePath.split('.').pop().split('?')[0] || 'png';
+      const cleanTitle = (wishTitle || `wish_${wishId}`).replace(/[^a-z0-9_-]/gi, '_').toLowerCase();
+      a.download = `elephant_house_wish_${wishId}_${cleanTitle}.${ext}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      const a = document.createElement('a');
+      a.href = imageSrc;
+      a.download = `wish_${wishId}_image`;
+      a.target = '_blank';
+      a.click();
     }
   };
 
@@ -1315,14 +1419,24 @@ export default function AdminDashboard({ onBackToCampaign }) {
                         <td>{u.last_login || 'Never'}</td>
                         <td>{u.created_at}</td>
                         <td>
-                          <button 
-                            onClick={() => handleDeleteUser(u.id, u.username)}
-                            disabled={adminUser?.id === u.id}
-                            className="btn-action delete"
-                            title={adminUser?.id === u.id ? "Cannot delete active session account" : "Delete user"}
-                          >
-                            <Trash2 size={14} /> Delete
-                          </button>
+                          <div style={{ display: 'flex', gap: '6px' }}>
+                            <button 
+                              onClick={() => handleStartEditUser(u)}
+                              className="btn-action view"
+                              style={{ backgroundColor: '#0284C7', color: '#FFF' }}
+                              title="Edit user credentials & info"
+                            >
+                              <Edit size={14} /> Edit
+                            </button>
+                            <button 
+                              onClick={() => handleDeleteUser(u.id, u.username)}
+                              disabled={adminUser?.id === u.id}
+                              className="btn-action delete"
+                              title={adminUser?.id === u.id ? "Cannot delete active session account" : "Delete user"}
+                            >
+                              <Trash2 size={14} /> Delete
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -1429,14 +1543,37 @@ export default function AdminDashboard({ onBackToCampaign }) {
 
             {/* Modal Body Grid */}
             <div className="record-modal-body">
-              {/* Left Column: Image & Upvotes */}
+              {/* Left Column: Image & Download Options */}
               <div className="record-image-col">
-                <div className="lightbox-image-wrap">
+                <div 
+                  className="lightbox-image-wrap clickable-img-wrap"
+                  onClick={() => setFullScreenImage({ src: previewWish.image_path, title: previewWish.wish_title, id: previewWish.id })}
+                  title="Click to view image full screen"
+                >
                   <img 
                     src={previewWish.image_path.startsWith('/') ? previewWish.image_path : `/${previewWish.image_path}`} 
                     alt={previewWish.wish_title}
                     onError={(e) => { e.target.src = '/uploads/sample_stick1.png'; }}
                   />
+                  <div className="image-hover-zoom-overlay">
+                    <Maximize2 size={24} color="#FFFFFF" />
+                    <span>View Fullscreen</span>
+                  </div>
+                </div>
+
+                <div className="record-image-actions">
+                  <button 
+                    onClick={() => setFullScreenImage({ src: previewWish.image_path, title: previewWish.wish_title, id: previewWish.id })}
+                    className="btn-image-action btn-view-full"
+                  >
+                    <Maximize2 size={14} /> Full View
+                  </button>
+                  <button 
+                    onClick={() => handleDownloadWishImage(previewWish.image_path, previewWish.wish_title, previewWish.id)}
+                    className="btn-image-action btn-download-img"
+                  >
+                    <Download size={14} /> Download Image
+                  </button>
                 </div>
               </div>
 
@@ -1493,6 +1630,7 @@ export default function AdminDashboard({ onBackToCampaign }) {
             {/* Modal Footer Actions */}
             <div className="record-modal-footer">
               <div className="modal-actions-left">
+
                 {previewWish.status !== 'approved' && (
                   <button 
                     onClick={() => {
@@ -1537,6 +1675,146 @@ export default function AdminDashboard({ onBackToCampaign }) {
                 Close
               </button>
             </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* Full-Screen Zoom Lightbox Modal */}
+      {fullScreenImage && (
+        <div className="full-image-viewer-overlay" onClick={() => setFullScreenImage(null)}>
+          <div className="full-image-viewer-container" onClick={e => e.stopPropagation()}>
+            
+            <div className="full-image-header">
+              <div className="full-image-title">
+                <h4>{fullScreenImage.title || `Wish #${fullScreenImage.id} Image`}</h4>
+                <small>Record #{fullScreenImage.id}</small>
+              </div>
+              
+              <div className="full-image-header-actions">
+                <button 
+                  onClick={() => handleDownloadWishImage(fullScreenImage.src, fullScreenImage.title, fullScreenImage.id)}
+                  className="btn-full-download"
+                  title="Download Image"
+                >
+                  <Download size={16} /> Download
+                </button>
+                <button 
+                  onClick={() => setFullScreenImage(null)} 
+                  className="btn-full-close"
+                  title="Close Full View"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+
+            <div className="full-image-body">
+              <img 
+                src={fullScreenImage.src.startsWith('/') ? fullScreenImage.src : `/${fullScreenImage.src}`}
+                alt={fullScreenImage.title}
+                onError={(e) => { e.target.src = '/uploads/sample_stick1.png'; }}
+              />
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* Edit User Credentials Modal */}
+      {editingUser && (
+        <div className="admin-lightbox-overlay" onClick={() => setEditingUser(null)}>
+          <div className="admin-lightbox-card" onClick={e => e.stopPropagation()} style={{ maxWidth: '520px' }}>
+            
+            <div className="record-modal-header" style={{ marginBottom: '1rem' }}>
+              <div className="header-left">
+                <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+                  <Edit size={20} color="#38BDF8" /> Edit User #{editingUser.id}
+                </h3>
+              </div>
+              <button className="lightbox-close-btn" onClick={() => setEditingUser(null)}>
+                <X size={18} />
+              </button>
+            </div>
+
+            {editUserError && (
+              <div className="admin-error-alert margin-bottom-md">
+                <XCircle size={16} /> <span>{editUserError}</span>
+              </div>
+            )}
+
+            {editUserMsg && (
+              <div className="admin-success-alert margin-bottom-md">
+                <Check size={16} /> <span>{editUserMsg}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleUpdateUser} className="admin-edit-user-form">
+              <div className="form-group margin-bottom-md">
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', color: '#CBD5E1' }}>Full Name *</label>
+                <input 
+                  type="text" 
+                  required 
+                  value={editName}
+                  onChange={e => setEditName(e.target.value)}
+                  placeholder="Enter full name"
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #334155', background: '#0F172A', color: '#FFF' }}
+                />
+              </div>
+
+              <div className="form-group margin-bottom-md">
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', color: '#CBD5E1' }}>Username *</label>
+                <input 
+                  type="text" 
+                  required 
+                  value={editUsername}
+                  onChange={e => setEditUsername(e.target.value)}
+                  placeholder="Enter username"
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #334155', background: '#0F172A', color: '#FFF' }}
+                />
+              </div>
+
+              <div className="form-group margin-bottom-md">
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', color: '#CBD5E1' }}>New Password <small style={{ color: '#94A3B8', fontWeight: 'normal' }}>(Leave blank to keep existing password)</small></label>
+                <input 
+                  type="password" 
+                  value={editPassword}
+                  onChange={e => setEditPassword(e.target.value)}
+                  placeholder="Enter new password if changing"
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #334155', background: '#0F172A', color: '#FFF' }}
+                />
+              </div>
+
+              <div className="form-group margin-bottom-lg">
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', color: '#CBD5E1' }}>Role</label>
+                <select 
+                  value={editRole} 
+                  onChange={e => setEditRole(e.target.value)} 
+                  className="admin-select"
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #334155', background: '#0F172A', color: '#FFF' }}
+                >
+                  <option value="admin">Administrator</option>
+                  <option value="superadmin">Super Administrator</option>
+                </select>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px' }}>
+                <button 
+                  type="button" 
+                  onClick={() => setEditingUser(null)} 
+                  className="btn-close-modal"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={isUpdatingUser} 
+                  className="admin-btn-primary"
+                >
+                  {isUpdatingUser ? 'Saving...' : 'Update User Credentials'}
+                </button>
+              </div>
+            </form>
 
           </div>
         </div>

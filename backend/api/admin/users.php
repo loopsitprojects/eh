@@ -1,6 +1,6 @@
 <?php
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 header('Content-Type: application/json');
 
@@ -15,6 +15,7 @@ $adminSession = requireAuth();
 $db = Database::getConnection();
 
 $method = $_SERVER['REQUEST_METHOD'];
+$input = json_decode(file_get_contents('php://input'), true) ?? [];
 
 if ($method === 'GET') {
     try {
@@ -32,9 +33,76 @@ if ($method === 'GET') {
     exit;
 }
 
-if ($method === 'POST') {
-    $input = json_decode(file_get_contents('php://input'), true);
+// UPDATE User (PUT method or POST with action === 'update')
+if ($method === 'PUT' || ($method === 'POST' && (($input['action'] ?? '') === 'update'))) {
+    $id = intval($input['id'] ?? 0);
+    $username = trim($input['username'] ?? '');
+    $password = trim($input['password'] ?? '');
+    $name = trim($input['name'] ?? '');
+    $role = trim($input['role'] ?? 'admin');
 
+    if ($id <= 0) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'Valid user ID is required']);
+        exit;
+    }
+
+    if (empty($username) || empty($name)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'Username and name are required']);
+        exit;
+    }
+
+    try {
+        // Check if user exists
+        $stmt = $db->prepare("SELECT id, username FROM admins WHERE id = ?");
+        $stmt->execute([$id]);
+        $existing = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$existing) {
+            http_response_code(404);
+            echo json_encode(['success' => false, 'error' => 'User not found']);
+            exit;
+        }
+
+        // Check duplicate username if username changed
+        $check = $db->prepare("SELECT id FROM admins WHERE username = ? AND id != ?");
+        $check->execute([$username, $id]);
+        if ($check->fetch()) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Username is already taken by another admin']);
+            exit;
+        }
+
+        if (!empty($password)) {
+            $hash = password_hash($password, PASSWORD_BCRYPT);
+            $update = $db->prepare("UPDATE admins SET username = ?, password_hash = ?, name = ?, role = ? WHERE id = ?");
+            $update->execute([$username, $hash, $name, $role, $id]);
+        } else {
+            $update = $db->prepare("UPDATE admins SET username = ?, name = ?, role = ? WHERE id = ?");
+            $update->execute([$username, $name, $role, $id]);
+        }
+
+        logAdminActivity($adminSession['admin_id'], $adminSession['username'], 'update_user', "Updated admin user '{$username}' (#{$id})");
+
+        echo json_encode([
+            'success' => true,
+            'message' => "User '{$username}' updated successfully",
+            'user' => [
+                'id' => $id,
+                'username' => $username,
+                'name' => $name,
+                'role' => $role
+            ]
+        ]);
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    }
+    exit;
+}
+
+if ($method === 'POST') {
     $username = trim($input['username'] ?? '');
     $password = trim($input['password'] ?? '');
     $name = trim($input['name'] ?? '');
